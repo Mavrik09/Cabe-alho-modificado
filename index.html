@@ -1,748 +1,584 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <title>Extrator de cabeçalhos do PJe - TJDFT</title>
+    <title>Extrator de Cabeçalhos PJe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <style>
-        :root {
-            --primary: #36f4c8;
-            --secondary:rgb(52, 74, 202);
-            --success: #2E8B57;
-            --danger: #F08080;
-            --info: #4682B4;
-            --dark: #121212;
-            --light: #f5f5f5;
-            --text-primary: #000000;
-            --text-secondary: #ffffff;
-            
-            /* Tema claro padrão */
-            --bg-color: #ffffff;
-            --text-color: var(--text-primary);
-            --input-bg: #ffffff;
-            --input-bg-secondary: #f5f5f5;
-            --input-border: #cccccc;
-            --button-bg: var(--secondary);
-            --button-hover: #4caf50;
-            --alert-bg: #d4edda;
-            --alert-text: #155724;
-            --alert-error-bg: #f8d7da;
-            --alert-error-text: #721c24;
-            --section-bg: #ffffff;
-            --shadow: rgba(0,0,0,0.1);
-            
-            /* Espaçamentos */
-            --space-xs: 5px;
-            --space-sm: 10px;
-            --space-md: 15px;
-            --space-lg: 20px;
-            --space-xl: 25px;
-            --space-xxl: 30px;
-            
-            /* Bordas */
-            --radius-sm: 5px;
-            --radius-md: 8px;
-            --radius-lg: 10px;
-            --radius-xl: 12px;
-            --radius-full: 50px;
-            
-            /* Tipografia */
-            --text-xs: 12px;
-            --text-sm: 14px;
-            --text-md: 16px;
-            --text-lg: 18px;
-            --text-xl: 20px;
-            --text-xxl: 24px;
-            
-            /* Transições */
-            --transition-fast: 0.15s;
-            --transition-normal: 0.3s;
-            --transition-slow: 0.5s;
-        }
+    :root {
+        --bg-color: #f8fafc;
+        --text-color: #1e293b;
+        --input-bg-color: #ffffff;
+        --input-border-color: #cbd5e1;
+        --primary-color: #3b82f6;
+        --secondary-color: #10b981;
+        --danger-color: #ef4444;
+        --card-bg: #ffffff;
+        --card-border: #e2e8f0;
+        --tab-bg: #e2e8f0;
+        --tab-active-bg: #ffffff;
+        --tab-active-text: #0f172a;
+        --tab-inactive-text: #64748b;
+        --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.05);
+        --radius: 12px;
+    }
+
+    body.dark {
+        --bg-color: #0f172a;
+        --text-color: #e2e8f0;
+        --input-bg-color: #1e293b;
+        --input-border-color: #334155;
+        --primary-color: #60a5fa;
+        --secondary-color: #34d399;
+        --danger-color: #f87171;
+        --card-bg: #1e293b;
+        --card-border: #334155;
+        --tab-bg: #1e293b;
+        --tab-active-bg: #334155;
+        --tab-active-text: #f8fafc;
+        --tab-inactive-text: #94a3b8;
+        --shadow-md: 0 2px 8px rgba(255, 255, 255, 0.05);
+    }
+
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        transition: background-color 0.3s, color 0.3s;
+        font-family: 'Inter', system-ui, sans-serif;
+        line-height: 1.6;
+    }
+
+    /* --- ALERTA --- */
+    #alert-box {
+        display: none;
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        z-index: 1050;
+        padding: 1rem 1.5rem;
+        border-radius: var(--radius);
+        font-weight: 600;
+        background-color: var(--secondary-color);
+        color: #fff;
+        box-shadow: var(--shadow-md);
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- TEXTAREAS --- */
+    #extrator-view textarea {
+        width: 100%;
+        height: 120px;
+        margin-bottom: 12px;
+        font-family: 'Inter', sans-serif;
+        font-size: 15px;
+        background-color: var(--input-bg-color);
+        color: var(--text-color);
+        border: 1px solid var(--input-border-color);
+        border-radius: var(--radius);
+        padding: 12px;
+        box-shadow: var(--shadow-md);
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    #extrator-view textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    /* --- BOTÕES --- */
+    .botao {
+        border: none;
+        color: #fff;
+        padding: 10px 22px;
+        font-weight: 600;
+        border-radius: var(--radius);
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        box-shadow: var(--shadow-md);
+    }
+
+    .botao:hover {
+        transform: translateY(-2px);
+        opacity: 0.95;
+    }
+
+    #extrairTextoCopiado { background-color: var(--secondary-color); }
+    #limparCaixas { background-color: var(--danger-color); }
+    #copiarDados { background-color: var(--primary-color); }
+    #gerarWord { background-color: #64748b; }
+
+    /* --- TABELA --- */
+    .tabela-dados-pje {
+        width: 100%;
+        max-width: 850px;
+        border-collapse: collapse;
+        margin-top: 24px;
+        background-color: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+    }
+
+    .tabela-dados-pje td {
+        border: 1px solid var(--card-border);
+        padding: 12px 16px;
+    }
+
+    .titulo-tabela { text-align: center; font-weight: 700; }
+    .titulo-principal { text-decoration: underline; }
+
+    /* --- ABAS --- */
+    .tab-button {
+        padding: 0.75rem 1.25rem;
+        cursor: pointer;
+        font-weight: 600;
+        border-radius: 10px 10px 0 0;
+        background-color: var(--tab-bg);
+        color: var(--tab-inactive-text);
+        border: 1px solid transparent;
+        border-bottom: none;
+        transition: all 0.2s ease;
+    }
+
+    .tab-button.active {
+        background-color: var(--tab-active-bg);
+        color: var(--tab-active-text);
+        border-color: var(--card-border);
+        box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    /* --- CLÁUSULAS --- */
+    #clausulas-list, #clausula-viewer {
+        height: calc(100vh - 250px);
+        overflow-y: auto;
+        background-color: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius);
+        padding: 12px;
+        box-shadow: var(--shadow-md);
+    }
+
+    .clausula-item {
+        padding: 10px 14px;
+        border-radius: 8px;
+        margin-bottom: 6px;
+        transition: all 0.2s ease;
+    }
+
+    .clausula-item:hover {
+        background-color: rgba(59, 130, 246, 0.1);
+    }
+
+    .clausula-item.selected {
+        background-color: var(--primary-color);
+        color: #fff !important;
+    }
+
+    /* --- EDITOR DE CLÁUSULAS --- */
+    #clause-editor-container { height: 260px; margin-top: 1rem; }
+    .ql-toolbar { border-radius: 0.75rem 0.75rem 0 0; }
+    .ql-container { border-radius: 0 0 0.75rem 0.75rem; font-size: 1rem; }
+
+    body.dark .ql-snow .ql-stroke,
+    body.dark .ql-snow .ql-fill,
+    body.dark .ql-snow .ql-picker-label {
+        stroke: var(--text-color);
+        color: var(--text-color);
+    }
+
+    /* --- MODAL --- */
+    .modal-backdrop {
+        background-color: rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(4px);
+    }
+</style>
 
-        /* Tema escuro */
-        body.dark {
-            --bg-color: #121212;
-            --text-color: #e0e0e0;
-            --input-bg: #333333;
-            --input-bg-secondary: #252525;
-            --input-border: #555555;
-            --button-bg: #3e3e3e;
-            --button-hover: #555555;
-            --alert-bg: #1e2b20;
-            --alert-text: #a7d7b4;
-            --alert-error-bg: #522024;
-            --alert-error-text: #f1b0b7;
-            --section-bg: #1e1e1e;
-            --shadow: rgba(0,0,0,0.3);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            transition: background-color var(--transition-normal), 
-                       color var(--transition-normal), 
-                       border-color var(--transition-normal);
-        }
-
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            padding: var(--space-lg);
-            min-height: 100vh;
-        }
-
-        /* Layout principal */
-        .main-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: var(--section-bg);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            box-shadow: 0 4px 15px var(--shadow);
-        }
-
-        header {
-            background-color: var(--button-bg);
-            padding: var(--space-xl) var(--space-lg);
-            text-align: center;
-            color: var(--text-secondary);
-            margin-bottom: 0;
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: var(--text-xxl);
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        header p {
-            margin: var(--space-sm) 0 0;
-            opacity: 0.9;
-            font-size: var(--text-md);
-        }
-
-        /* Seções */
-        .section {
-            padding: var(--space-xl);
-            background-color: var(--section-bg);
-            border-bottom: 1px solid var(--input-border);
-        }
-
-        .section:last-child {
-            border-bottom: none;
-        }
-
-        .section-title {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 0 0 var(--space-md) 0;
-            padding-bottom: var(--space-sm);
-            border-bottom: 1px solid var(--input-border);
-            font-size: var(--text-xl);
-            font-weight: 500;
-        }
-
-        /* Inputs */
-        textarea {
-            width: 100%;
-            min-height: 150px;
-            padding: var(--space-md);
-            margin-bottom: var(--space-md);
-            font-family: 'Consolas', 'Courier New', monospace;
-            font-size: var(--text-md);
-            color: var(--text-color);
-            background-color: var(--input-bg);
-            border: 2px solid var(--input-border);
-            border-radius: var(--radius-md);
-            resize: vertical;
-            transition: border-color var(--transition-normal), 
-                       box-shadow var(--transition-normal);
-        }
-
-        textarea:focus {
-            border-color: var(--button-hover);
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
-            outline: none;
-        }
-
-        /* Botões */
-        .button-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: var(--space-md);
-            padding: var(--space-lg);
-            background-color: var(--input-bg-secondary);
-            border-bottom: 1px solid var(--input-border);
-        }
-
-        .btn {
-            border: none;
-            color: var(--text-secondary);
-            padding: var(--space-md) var(--space-xl);
-            font-size: var(--text-md);
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: var(--radius-md);
-            transition: all var(--transition-normal);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 5px var(--shadow);
-            min-width: 200px;
-            text-align: center;
-        }
-
-        .btn i {
-            margin-right: var(--space-xs);
-            font-size: 1.1em;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px var(--shadow);
-        }
-
-        .btn:active {
-            transform: translateY(1px);
-            box-shadow: 0 1px 3px var(--shadow);
-        }
-
-        .btn:focus {
-            outline: 3px solid var(--button-hover);
-            outline-offset: 2px;
-            box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.3);
-        }
-
-        /* Variantes de botão */
-        .btn-primary {
-            background-color: var(--button-bg);
-        }
-
-        .btn-primary:hover {
-            background-color: var(--button-hover);
-        }
-
-        .btn-success {
-            background-color: var(--success);
-        }
-
-        .btn-success:hover {
-            background-color: #3CB371;
-        }
-
-        .btn-danger {
-            background-color: var(--danger);
-        }
-
-        .btn-danger:hover {
-            background-color: #FFB6C1;
-        }
-
-        .btn-info {
-            background-color: #708090;
-        }
-
-        .btn-info:hover {
-            background-color: #5F9EA0;
-        }
-
-        .btn-copy {
-            background-color: var(--info);
-            padding: var(--space-sm) var(--space-md);
-            font-size: var(--text-sm);
-            min-width: auto;
-        }
-
-        .btn-copy:hover {
-            background-color: #00BFFF;
-        }
-
-        /* Alertas */
-        .alert {
-            display: none;
-            position: fixed;
-            top: var(--space-lg);
-            right: var(--space-lg);
-            z-index: 1000;
-            padding: var(--space-md) var(--space-xl);
-            border-radius: var(--radius-md);
-            box-shadow: 0 3px 10px var(--shadow);
-            align-items: center;
-            font-weight: 500;
-            animation: slideIn 0.3s ease-out forwards;
-        }
-
-        .alert::before {
-            content: "✓";
-            margin-right: var(--space-sm);
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-
-        .alert-error::before {
-            content: "✗";
-        }
-
-        .alert-success {
-            background-color: var(--alert-bg);
-            color: var(--alert-text);
-        }
-
-        .alert-error {
-            background-color: var(--alert-error-bg);
-            color: var(--alert-error-text);
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Áreas de saída */
-        .output-area {
-            border: 1px solid var(--input-border);
-            min-height: 100px;
-            padding: var(--space-md);
-            background-color: var(--input-bg);
-            color: var(--text-color);
-            border-radius: var(--radius-md);
-            font-family: Arial, sans-serif;
-            font-size: var(--text-md);
-            line-height: 1.5;
-            white-space: pre-wrap;
-        }
-
-        .output-area[contenteditable="true"] {
-            border: 1px dashed var(--info);
-            background-color: #f0f8ff;
-            cursor: text;
-        }
-
-        body.dark .output-area[contenteditable="true"] {
-            border: 1px dashed #3498db;
-            background-color: #2c3e50;
-        }
-
-        /* Caixas de dados */
-        .data-box {
-            margin-bottom: var(--space-xl);
-            background-color: var(--input-bg-secondary);
-            border-radius: var(--radius-md);
-            padding: var(--space-md);
-            border: 1px solid var(--input-border);
-        }
-
-        .data-box-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: var(--space-md);
-            padding-bottom: var(--space-sm);
-            border-bottom: 1px solid var(--input-border);
-        }
-
-        .data-box-title {
-            font-weight: bold;
-            font-size: var(--text-lg);
-        }
-
-        /* Componentes de UI */
-        .theme-switcher {
-            position: fixed;
-            top: var(--space-lg);
-            right: var(--space-lg);
-            z-index: 1001;
-            text-align: center;
-            background-color: var(--section-bg);
-            padding: var(--space-sm);
-            border-radius: var(--radius-full);
-            box-shadow: 0 2px 10px var(--shadow);
-        }
-
-        .theme-label {
-            cursor: pointer;
-            display: inline-block;
-        }
-
-        .theme-icon {
-            color: var(--text-primary);
-            transition: color var(--transition-normal);
-            font-size: var(--text-xl);
-        }
-
-        body.dark .theme-icon {
-            color: #f39c12;
-        }
-
-        .theme-text {
-            margin-top: var(--space-xs);
-            font-size: var(--text-xs);
-            color: var(--text-color);
-        }
-
-        /* Ajuda flutuante */
-        .help-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: fixed;
-            bottom: var(--space-lg);
-            right: var(--space-lg);
-            z-index: 1000;
-            animation: move 1.5s ease-in-out infinite;
-        }
-
-        .help-icon {
-            font-size: 28px;
-            color: #007BFF;
-            cursor: pointer;
-            background-color: var(--section-bg);
-            padding: var(--space-md);
-            border-radius: var(--radius-full);
-            transition: all var(--transition-normal);
-            box-shadow: 0 2px 10px var(--shadow);
-            animation: pulse 2s infinite;
-        }
-
-        .help-icon:hover {
-            color: #f39c12;
-            transform: scale(1.1);
-            animation: none;
-        }
-
-        .help-text {
-            color: #007BFF;
-            font-size: var(--text-sm);
-            margin-top: var(--space-xs);
-            font-weight: bold;
-            transition: color var(--transition-normal);
-        }
-
-        .help-container:hover .help-text {
-            color: #f39c12;
-        }
-
-        .tooltip {
-            visibility: hidden;
-            position: fixed;
-            bottom: 80px;
-            right: var(--space-lg);
-            background-color: rgba(0, 0, 0, 0.9);
-            color: #ffffff;
-            padding: var(--space-sm) var(--space-md);
-            border-radius: var(--radius-md);
-            font-size: var(--text-sm);
-            z-index: 1001;
-            opacity: 0;
-            transition: all var(--transition-normal);
-            max-width: 250px;
-            text-align: center;
-        }
-
-        .help-container:hover .tooltip {
-            visibility: visible;
-            opacity: 1;
-            bottom: 90px;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes move {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-            100% { transform: translateY(0); }
-        }
-
-        /* Rodapé */
-        footer {
-            text-align: center;
-            margin-top: var(--space-xxl);
-            padding-top: var(--space-lg);
-            border-top: 1px solid var(--input-border);
-            font-size: var(--text-sm);
-            color: var(--text-color);
-        }
-
-        footer a {
-            color: var(--button-bg);
-            text-decoration: none;
-            transition: color var(--transition-fast);
-        }
-
-        footer a:hover {
-            color: var(--button-hover);
-            text-decoration: underline;
-        }
-
-        /* Utilitários */
-        .hidden {
-            display: none !important;
-        }
-
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border-width: 0;
-        }
-
-        /* Responsividade */
-        @media (max-width: 768px) {
-            body {
-                padding: var(--space-md);
-            }
-            
-            header {
-                padding: var(--space-lg) var(--space-md);
-            }
-            
-            header h1 {
-                font-size: var(--text-xl);
-            }
-            
-            .button-container {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .btn {
-                width: 100%;
-                max-width: 300px;
-            }
-            
-            .section-title {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .btn-copy {
-                margin-top: var(--space-sm);
-                align-self: flex-end;
-            }
-            
-            .theme-switcher {
-                top: var(--space-md);
-                right: var(--space-md);
-            }
-            
-            .help-container {
-                bottom: var(--space-md);
-                right: var(--space-md);
-            }
-            
-            .tooltip {
-                right: var(--space-md);
-                max-width: calc(100% - 40px);
-            }
-        }
-
-        @media (max-width: 480px) {
-            :root {
-                --space-lg: 15px;
-                --space-xl: 20px;
-            }
-            
-            header h1 {
-                font-size: var(--text-lg);
-            }
-            
-            header p {
-                font-size: var(--text-sm);
-            }
-            
-            .section {
-                padding: var(--space-lg);
-            }
-            
-            textarea {
-                font-size: var(--text-sm);
-            }
-            
-            .output-area {
-                font-size: var(--text-sm);
-            }
-            
-            footer {
-                font-size: var(--text-xs);
-            }
-        }
-
-        /* Estilos para parágrafos */
-        .parte {
-            margin-top: 0;
-            margin-bottom: 0;
-            line-height: 1.5;
-            display: block;
-        }
-
-        .parte + .parte {
-            margin-top: 10px;
-        }
-
-        /* Estilo para o autor */
-        .author-info {
-            text-align: center;
-            font-family: Georgia;
-            margin-bottom: var(--space-lg);
-        }
-    </style>
 </head>
-<body>
-    <div class="main-container">
-        <!-- Tema switcher -->
-        <div class="theme-switcher">
+<body class="p-4 md:p-8">
+
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+        <div>
+            <h1 class="text-3xl font-bold">Extrator de Cabeçalhos PJe</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Extrator de Cabeçalhos e Gestor de Cláusulas</p>
+        </div>
+        <div class="fixed top-4 right-4 z-50 text-center flex items-center gap-4">
+            <div id="Autor" class="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">
+                Filipe S. Lima | Gabriel F. Angst<br>e-CEJUSC 3/TJDFT | 13/10/25 13:55 <br><a href="https://tjdf.sharepoint.com/sites/eCEJUSC3/_layouts/15/stream.aspx?id=%2Fsites%2FeCEJUSC3%2FPasta%20de%20rede%2F04%20V%C3%ADdeos%20Instrut%C3%B3rios%2F07%2E%20Ferramentas%20Adicionais%2F01%20-%20Extrator%20PJe%2Emp4" target="_blank">❓ Como utilizar? </a>
+            </div>
             <label>
-                <input type="checkbox" id="theme-toggle" class="sr-only">
-                <span class="theme-label">
+                <input type="checkbox" id="theme-toggle" class="hidden">
+                <span id="theme-label" class="cursor-pointer p-3 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
                     <i id="theme-icon" class="fas fa-moon"></i>
                 </span>
             </label>
-            <div id="theme-text" class="theme-text">Tema Claro</div>
         </div>
-        
-        <!-- Cabeçalho -->
-        <header>
-            <h1><i class="fas fa-file-alt"></i> Extrator de cabeçalhos do PJe</h1>
-            <p>Ferramenta para extração e formatação de dados processuais</p>
-        </header>
-        
-        <!-- Informações do autor -->
-        <div class="author-info">
-            Filipe de Sousa Lima | Gabriel Freitas Angst <br>
-            5º NUVIMEC/TJDFT | <b>18/03/2025 15:15</b> 
-            <a title="Veja um tutorial em vídeo de como utilizar esta ferramenta" 
-               href="https://tjdf.sharepoint.com/sites/5NUVIMEC/_layouts/15/stream.aspx?id=%2Fsites%2F5NUVIMEC%2FPasta%20de%20rede%2F04%20V%C3%ADdeos%20Instrut%C3%B3rios%2F07%2E%20Ferramentas%20Adicionais%2F01%20%2D%20Extrator%20PJe%2Emp4&ga=1&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2E8feed9ae%2D0b9e%2D4e31%2D943c%2D9b089e43d927" 
-               target="_blank">
-               <i class="fas fa-video"></i>
-            </a>
-        </div>
-        
-        <!-- Seção de entrada -->
-        <section class="section">
-            <h2 class="section-title">
-                <span><i class="fas fa-paste"></i> Cole os dados do PJe</span>
-            </h2>
-            <textarea id="caixa1" placeholder="Após abrir o cabeçalho do processo no PJe e copiar todos os dados apertando Ctrl+A e Ctrl+C, clique no botão abaixo 'Extrair texto copiado'"></textarea>
-            
-            <div class="button-container">
-                <button class="btn btn-success" id="extrairTextoCopiado" onclick="extrairClipboard()">
-                    <i class="fas fa-paste"></i> Extrair texto copiado
-                </button>  
-                <button class="btn btn-danger" id="limparCaixas" onclick="limparCaixas()">
-                    <i class="fas fa-trash-alt"></i> Limpar todas as caixas
-                </button>
-                <button class="btn btn-info" id="gerarWord" onclick="gerarWord()">
-                    <i class="fas fa-file-word"></i> Baixar Doc Word
-                </button>
-            </div>
-            
-            <!-- Caixas ocultas para processamento -->
-            <textarea id="caixa2" class="hidden" placeholder="Caixa de Texto 2"></textarea>
-            <textarea id="caixa3" class="hidden" placeholder="Caixa de Texto 3"></textarea>
-            <textarea id="caixa4" class="hidden" placeholder="Caixa de Texto 4"></textarea>
-            <textarea id="caixa5" class="hidden" placeholder="Caixa de Texto 5"></textarea>
-            <textarea id="caixa6" class="hidden" placeholder="Caixa de Texto 6"></textarea>
-            <textarea id="caixa7" class="hidden" placeholder="Caixa de Texto 7"></textarea>
-        </section>
-        
-        <!-- Alert box -->
-        <div id="alert-box" class="alert alert-success">Dados copiados <b>com sucesso</b>!</div>
-        
-        <!-- Seção de saída - Dados extraídos -->
-        <section class="section">
-            <div class="data-box">
-                <div class="data-box-header">
-                    <span class="data-box-title"><i class="fas fa-database"></i> DADOS EXTRAÍDOS DO PJE</span>
-                    <button class="btn btn-copy" id="copiarCaixa8" onclick="copiarCaixa8()">
-                        <i class="fas fa-copy"></i> Copiar
-                    </button>
-                </div>
-                <div id="output1" class="output-area" contenteditable="true"></div>
-            </div>
-        </section>
-        
-        <!-- Seção de saída - Participantes -->
-        <section class="section">
-            <div class="data-box">
-                <div class="data-box-header">
-                    <span class="data-box-title"><i class="fas fa-users"></i> PARTICIPANTES DA AUDIÊNCIA</span>
-                    <button class="btn btn-copy" id="copiarCaixa9" onclick="copiarCaixa9()">
-                        <i class="fas fa-copy"></i> Copiar
-                    </button>
-                </div>
-                <div id="output2" class="output-area" contenteditable="true"></div>
-            </div>
-        </section>
-        
-        <!-- Seção de saída - Dados das partes -->
-        <section class="section">
-            <div class="data-box">
-                <div class="data-box-header">
-                    <span class="data-box-title"><i class="fas fa-user-tie"></i> DADOS DAS PARTES</span>
-                    <button class="btn btn-copy" id="copiarCaixa10" onclick="copiarCaixa10()">
-                        <i class="fas fa-copy"></i> Copiar
-                    </button>
-                </div>
-                <div id="output3" class="output-area" contenteditable="true"></div>
-            </div>
-        </section>
-        
-        <!-- Rodapé -->
-        <footer>
-            <p>Desenvolvido para o TJDFT | 5º NUVIMEC</p>
-            <p>© 2025 - Todos os direitos reservados</p>
-        </footer>
-    </div>
-    
-    <!-- Ajuda flutuante -->
-    <div class="help-container">
-        <a href="https://tjdf.sharepoint.com/:v:/s/5NUVIMEC/ESXMYP7sowlMhRIh_Sxji7cBJ7porA38rkrwj0oSyYofuw" target="_blank">
-            <i class="fas fa-question-circle help-icon"></i>
-        </a>
-        <div class="help-text">Ajuda?</div>
-        <div class="tooltip">Está com dificuldade? Nosso tutorial pode ajudar!</div>
+    </header>
+
+    <div class="mb-4 border-b border-gray-200 dark:border-gray-700">
+        <nav class="flex -mb-px" aria-label="Tabs">
+            <button id="tab-extrator" class="tab-button active" onclick="showTab('extrator')">
+                Extrator de Cabeçalhos
+            </button>
+            <button id="tab-clausulas" class="tab-button" onclick="showTab('clausulas')">
+                Cláusulas Minutadas
+            </button>
+        </nav>
     </div>
 
-    <script>
-        function showAlert3s() {
+    <main>
+        <div id="extrator-view">
+            <textarea id="caixa1" placeholder="Após abrir o cabeçalho do processo no PJe e copiar todos os dados apertando Ctrl+A e Ctrl+C, cole aqui ou clique no botão 'Extrair texto copiado'"></textarea>
+            <textarea id="caixa2" class="hidden"></textarea>
+            <textarea id="caixa3" class="hidden"></textarea>
+            <textarea id="caixa4" class="hidden"></textarea>
+            <textarea id="caixa5" class="hidden"></textarea>
+            <textarea id="caixa6" class="hidden"></textarea>
+            <textarea id="caixa7" class="hidden"></textarea>
+            
+            <div class="flex flex-wrap gap-2 mb-6">
+                <button class="botao" id="extrairTextoCopiado" onclick="extrairClipboard()">Extrair texto copiado</button>
+                <button class="botao" id="limparCaixas" onclick="limparCaixas()">Limpar Caixas</button>
+                <button class="botao" id="copiarDados" onclick="copiarDadosFormatados()">Copiar Cabeçalho</button>
+                <button class="botao" id="gerarWord" onclick="gerarWord()" hidden>Baixar Word (opcional)</button>
+            </div>
+      
+            <div id="dados-para-copiar" class="space-y-6">
+                <table class="tabela-dados-pje">
+  <tbody>
+    <tr>
+      <td>
+        <p class="titulo-tabela"><span class="titulo-principal">DADOS EXTRAÍDOS DO PJE</span></p>
+        <div id="output1" contenteditable="true"></div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="tabela-dados-pje">
+  <tbody>
+    <tr>
+      <td>
+        <p class="titulo-tabela"><span class="titulo-principal">PARTICIPANTES DA AUDIÊNCIA</span></p>
+        <div id="output2" contenteditable="true"></div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="tabela-dados-pje">
+  <tbody>
+    <tr>
+      <td>
+        <p class="titulo-tabela">
+          <span class="titulo-principal">DADOS DAS PARTES</span><br>
+          <span class="subtitulo-tabela text-xs">(Portaria Conjunta GPR, GPVP, GSVP e GC n.º 71/2013; e CPC, art. 319, II)</span>
+        </p>
+        <div id="output3" contenteditable="true"></div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            </div>
+        </div>
+
+        <div id="clausulas-view" class="hidden">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="md:col-span-1 flex flex-col gap-4">
+                    <div class="relative">
+                        <input type="text" id="search-clausulas" placeholder="Buscar cláusula..." class="w-full p-3 rounded-lg border bg-[var(--input-bg-color)] border-[var(--input-border-color)] pl-10">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                    <div id="clausulas-list" class="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-lg p-2 space-y-1">
+                        </div>
+                    <button id="incluir-clausula-btn" class="w-full p-3 text-white font-bold rounded-lg bg-[var(--secondary-color)] hover:opacity-90 transition-opacity">
+                        <i class="fas fa-plus-circle mr-2"></i>Incluir / Gerenciar
+                    </button>
+                </div>
+
+                <div class="md:col-span-2 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-lg p-6">
+                    <div id="clausula-viewer">
+                        <div class="text-center text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-file-alt fa-3x mb-4"></i>
+                            <p class="font-semibold">Selecione uma cláusula à esquerda para visualizar seu conteúdo aqui.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="alert-box"></div>
+
+    <div id="password-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop">
+        <div class="bg-[var(--card-bg)] rounded-lg shadow-2xl p-8 w-full max-w-sm m-4">
+            <h3 class="text-xl font-semibold mb-4">Acesso Restrito</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">Insira a senha para gerenciar as cláusulas.</p>
+            <input type="password" id="password-input" class="w-full p-2 border border-[var(--input-border-color)] rounded-md bg-[var(--input-bg-color)]" placeholder="Senha">
+            <p id="password-error" class="text-red-500 text-sm mt-2 hidden">Senha incorreta.</p>
+            <div class="flex justify-end gap-3 mt-6">
+                <button onclick="closeModal('password-modal')" class="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded-md hover:opacity-80">Cancelar</button>
+                <button onclick="checkPassword()" class="px-4 py-2 bg-[var(--primary-color)] text-white rounded-md hover:opacity-80 font-semibold">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="manage-clause-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop">
+        <div class="bg-[var(--card-bg)] rounded-lg shadow-2xl p-8 w-full max-w-4xl m-4 flex flex-col gap-6 max-h-[90vh]">
+            <h3 class="text-2xl font-semibold">Gerenciar Cláusulas</h3>
+            <form id="clause-form" class="flex flex-col gap-4">
+                <input type="hidden" id="clause-id">
+                <input type="text" id="clause-title" placeholder="Título da Cláusula" required class="w-full p-3 border border-[var(--input-border-color)] rounded-md bg-[var(--input-bg-color)]">
+                <div id="clause-editor-container"></div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" onclick="resetClauseForm()" class="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded-md hover:opacity-80">Novo</button>
+                    <button type="submit" class="px-4 py-2 bg-[var(--primary-color)] text-white rounded-md hover:opacity-80 font-semibold">Salvar Cláusula</button>
+                </div>
+            </form>
+            <div class="border-t border-[var(--card-border)] pt-4 flex-grow overflow-y-auto">
+                <h4 class="font-semibold mb-2">Cláusulas Existentes</h4>
+                <div id="manage-clausulas-list" class="space-y-2">
+                    </div>
+            </div>
+             <div class="flex justify-end pt-4 border-t border-[var(--card-border)]">
+                <button type="button" onclick="closeModal('manage-clause-modal')" class="px-6 py-2 bg-gray-200 dark:bg-gray-600 rounded-md hover:opacity-80">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    // Importações do Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getDatabase, ref, onValue, set, push, remove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+    // --- CONFIGURAÇÃO FIREBASE ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyB4Wx4yJq4xjU4Y0-DWJc2H7aWeBFQg7xk",
+        authDomain: "extrator-clausulas.firebaseapp.com",
+        databaseURL: "https://extrator-clausulas-default-rtdb.firebaseio.com",
+        projectId: "extrator-clausulas",
+        storageBucket: "extrator-clausulas.appspot.com",
+        messagingSenderId: "530836265351",
+        appId: "1:530836265351:web:97bfb9901b4c8d77989b22",
+        measurementId: "G-P710G5CVT5"
+    };
+    
+    // Inicialização do Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const clausesRef = ref(db, 'clauses');
+    let allClauses = {};
+    let quill = null;
+
+    // --- LÓGICA GERAL E DE ABAS ---
+    function initializeQuillEditor() {
+        if (document.querySelector('#clause-editor-container .ql-editor')) {
+            return; // Já inicializado
+        }
+        quill = new Quill('#clause-editor-container', {
+            modules: {
+                toolbar: [
+                    [{ 'font': [] }],
+                    [{ 'size': ['small', false, 'large', 'huge'] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'header': 1 }, { 'header': 2 }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'align': [] }],
+                    ['clean']
+                ]
+            },
+            theme: 'snow'
+        });
+    }
+
+    window.showTab = (tabName) => {
+        document.getElementById('extrator-view').classList.add('hidden');
+        document.getElementById('clausulas-view').classList.add('hidden');
+        document.getElementById('tab-extrator').classList.remove('active');
+        document.getElementById('tab-clausulas').classList.remove('active');
+        document.getElementById(`${tabName}-view`).classList.remove('hidden');
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+    }
+
+    window.showAlert3s = (message) => {
         const alertBox = document.getElementById('alert-box');
+        alertBox.textContent = message || 'Ação concluída com sucesso!';
         alertBox.style.display = 'block';
         setTimeout(() => {
             alertBox.style.display = 'none';
         }, 3000);
     }
 
-    function extrairClipboard() {
+    window.openModal = (modalId) => {
+        document.getElementById(modalId).classList.replace('hidden', 'flex');
+        if (modalId === 'manage-clause-modal') {
+            initializeQuillEditor();
+        }
+    }
+    window.closeModal = (modalId) => document.getElementById(modalId).classList.replace('flex', 'hidden');
+
+    // --- LÓGICA DAS CLÁUSULAS ---
+    document.getElementById('incluir-clausula-btn').addEventListener('click', () => openModal('password-modal'));
+    window.checkPassword = () => {
+        const passwordInput = document.getElementById('password-input');
+        const passwordError = document.getElementById('password-error');
+        if (passwordInput.value === '123') {
+            passwordInput.value = '';
+            passwordError.classList.add('hidden');
+            closeModal('password-modal');
+            openModal('manage-clause-modal');
+        } else {
+            passwordError.classList.remove('hidden');
+        }
+    };
+
+    const renderClauses = (filter = '') => {
+        const listContainer = document.getElementById('clausulas-list');
+        const manageListContainer = document.getElementById('manage-clausulas-list');
+        listContainer.innerHTML = '';
+        manageListContainer.innerHTML = '';
+        const filteredClauses = Object.entries(allClauses).filter(([id, clause]) => 
+            clause.title.toLowerCase().includes(filter.toLowerCase())
+        ).sort(([, a], [, b]) => a.title.localeCompare(b.title));
+        if (filteredClauses.length === 0) {
+            const emptyMsg = `<div class="text-center text-sm text-gray-500 p-4">Nenhuma cláusula encontrada.</div>`;
+            listContainer.innerHTML = emptyMsg;
+            manageListContainer.innerHTML = emptyMsg;
+            return;
+        }
+        filteredClauses.forEach(([id, clause]) => {
+            const item = document.createElement('div');
+            item.className = 'clausula-item p-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700';
+            item.textContent = clause.title;
+            item.dataset.id = id;
+            item.onclick = () => selectClause(id);
+            listContainer.appendChild(item);
+            const manageItem = document.createElement('div');
+            manageItem.className = 'flex justify-between items-center p-2 rounded-md bg-gray-100 dark:bg-gray-700';
+            manageItem.innerHTML = `<span class="font-medium">${clause.title}</span><div class="flex gap-2"><button onclick="editClause('${id}')" class="text-blue-500 hover:text-blue-700"><i class="fas fa-edit"></i></button><button onclick="deleteClause('${id}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button></div>`;
+            manageListContainer.appendChild(manageItem);
+        });
+    }
+    
+    window.selectClause = (id) => {
+        const clause = allClauses[id];
+        if (!clause) return;
+        document.querySelectorAll('.clausula-item').forEach(el => el.classList.remove('selected'));
+        const selectedElement = document.querySelector(`.clausula-item[data-id="${id}"]`);
+        if (selectedElement) {
+            selectedElement.classList.add('selected');
+        }
+        const viewer = document.getElementById('clausula-viewer');
+        viewer.innerHTML = `<div class="flex justify-between items-center mb-4 pb-2 border-b border-[var(--card-border)]"><h3 class="text-2xl font-bold">${clause.title}</h3><button onclick="copyClauseContent()" class="botao flex items-center" style="background-color: var(--primary-color);"><i class="fas fa-copy mr-2"></i>Copiar</button></div><div id="clause-content-display" class="prose dark:prose-invert max-w-none">${clause.content}</div>`;
+    }
+
+    document.getElementById('search-clausulas').addEventListener('input', (e) => {
+        renderClauses(e.target.value);
+    });
+
+    document.getElementById('clause-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('clause-id').value;
+        const title = document.getElementById('clause-title').value;
+        const content = quill.root.innerHTML;
+        if (title.trim() === '' || content === '<p><br></p>') {
+            showAlert3s('O título e o conteúdo não podem estar vazios.');
+            return;
+        }
+        const clauseData = { title, content };
+        try {
+            if (id) {
+                await set(ref(db, `clauses/${id}`), clauseData);
+                showAlert3s('Cláusula atualizada com sucesso!');
+            } else {
+                await push(clausesRef, clauseData);
+                showAlert3s('Cláusula criada com sucesso!');
+            }
+            resetClauseForm();
+        } catch (error) {
+            console.error("Erro ao salvar cláusula: ", error);
+            showAlert3s('Erro ao salvar. Tente novamente.');
+        }
+    });
+
+    window.resetClauseForm = () => {
+        document.getElementById('clause-form').reset();
+        document.getElementById('clause-id').value = '';
+        if (quill) {
+            quill.setContents([]);
+        }
+    }
+
+    window.editClause = (id) => {
+        const clause = allClauses[id];
+        if (!clause) return;
+        document.getElementById('clause-id').value = id;
+        document.getElementById('clause-title').value = clause.title;
+        if (quill) {
+             quill.clipboard.dangerouslyPasteHTML(clause.content);
+        }
+    }
+
+    window.deleteClause = async (id) => {
+        if (confirm('Tem certeza que deseja excluir esta cláusula?')) {
+            try {
+                await remove(ref(db, `clauses/${id}`));
+                showAlert3s('Cláusula excluída com sucesso!');
+            } catch (error) {
+                console.error("Erro ao excluir: ", error);
+                showAlert3s('Erro ao excluir. Tente novamente.');
+            }
+        }
+    }
+
+    onValue(clausesRef, (snapshot) => {
+        allClauses = snapshot.val() || {};
+        renderClauses(document.getElementById('search-clausulas').value);
+    });
+
+    window.copyClauseContent = () => {
+        const contentElement = document.getElementById('clause-content-display');
+        if (!contentElement) {
+            showAlert3s('Nenhum conteúdo para copiar.');
+            return;
+        }
+        const htmlContent = contentElement.innerHTML;
+        const contentToCopy = `<div style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 20pt; text-align: justify;">${htmlContent}</div>`;
+        const blob = new Blob([contentToCopy], { type: 'text/html' });
+        const clipboardItem = new ClipboardItem({ 'text/html': blob });
+        navigator.clipboard.write([clipboardItem]).then(() => {
+            showAlert3s('Conteúdo da cláusula copiado! Lembre-se de alterar a forma de colar no Word para "Manter a formatação original"');
+        }).catch(err => {
+            console.error('Falha ao copiar conteúdo: ', err);
+            showAlert3s('Erro ao copiar o conteúdo.');
+        });
+    };
+
+    // --- LÓGICA DO EXTRATOR DE CABEÇALHOS ---
+    window.extrairClipboard = () => {
         navigator.clipboard.readText().then(text => {
             document.getElementById('caixa1').value = text;
             processarCaixas();
+        }).catch(err => {
+            console.error('Falha ao ler da área de transferência: ', err);
+            showAlert3s('Erro ao acessar a área de transferência.');
         });
     }
 
-    function limparCaixas() {
+    window.limparCaixas = () => {
         for (let i = 1; i <= 7; i++) {
             document.getElementById('caixa' + i).value = '';
         }
@@ -750,418 +586,322 @@
         document.getElementById('output2').innerHTML = '';
         document.getElementById('output3').innerHTML = '';
     }
+    
+// ===================================================================
+// FUNÇÃO DE COPIAR CABEÇALHO CORRIGIDA
+// ===================================================================
+    window.copiarDadosFormatados = () => {
+    const output1 = document.getElementById('output1').innerHTML;
+    const output2 = document.getElementById('output2').innerHTML;
+    const output3 = document.getElementById('output3').innerHTML;
 
-    function copiarCaixa8() {
-        copiarTexto('output1');
+    if (!output1 && !output2 && !output3) {
+        showAlert3s('Não há dados para copiar.');
+        return;
     }
 
-    function copiarCaixa9() {
-        copiarTexto('output2');
-    }
-
-    function copiarCaixa10() {
-        copiarTexto('output3');
-    }
-
-//Função copiar texto
-    function copiarTexto(id) {
-    const element = document.getElementById(id);
-
-    // Criar um elemento temporário para copiar com a formatação desejada
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = element.innerHTML;
-
-    // Aplica as regras de formatação para parágrafos
-    const style = `
-        p {
-            margin-top: 0;
-            margin-bottom: 0;
-            line-height: 27px; /* Espaçamento entre linhas 1.5 vezes o tamanho da fonte */
-            font-family: Arial, sans-serif; /* Garantir a fonte Arial */
-            font-size: 16px; /* Tamanho de fonte 16px */
-        }
-        .content {
-            font-family: Arial, sans-serif; /* Garantir a fonte Arial */
-            font-size: 16px; /* Tamanho de fonte 16px */
-            color: #000000;
-            background: transparent; /* Remover qualquer fundo */
-            white-space: pre-wrap;
-        }
+    const htmlString = `
+        <div style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 18pt;">
+            <table style="border-collapse: collapse; width: 100%; border: 1px solid black;">
+                <tbody>
+                    <tr>
+                        <td style="border: 1px solid black; padding: 5pt; line-height: 18pt;">
+                            <p style="text-align: center; font-family: Arial, sans-serif; font-size: 12pt; line-height: 18pt;"><strong style="text-decoration: underline;">DADOS EXTRAÍDOS DO PJE</strong></p>
+                            <div style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 18pt;">${output1}</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="font-family: Arial, sans-serif; font-size: 6pt; margin: 0; padding: 0;">&nbsp;</p>
+            <table style="border-collapse: collapse; width: 100%; border: 1px solid black;">
+                <tbody>
+                    <tr>
+                        <td style="border: 1px solid black; padding: 5pt; line-height: 18pt;">
+                            <p style="text-align: center; font-family: Arial, sans-serif; font-size: 12pt; line-height: 18pt;"><strong style="text-decoration: underline;">PARTICIPANTES DA AUDIÊNCIA</strong></p>
+                            <div style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 18pt;">${output2}</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="font-family: Arial, sans-serif; font-size: 6pt; margin: 0; padding: 0;">&nbsp;</p>
+            <table style="border-collapse: collapse; width: 100%; border: 1px solid black;">
+                <tbody>
+                    <tr>
+                        <td style="border: 1px solid black; padding: 5pt; line-height: 18pt;">
+                            <p style="text-align: center; font-family: Arial, sans-serif; font-size: 12pt; line-height: 18pt;">
+                                <strong style="text-decoration: underline;">DADOS DAS PARTES</strong><br>
+                                <span style="font-size: 12pt;">(Portaria Conjunta GPR, GPVP, GSVP e GC n.º 71/2013; e CPC, art. 319, II)</span>
+                            </p>
+                            <div style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 18pt;">${output3}</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     `;
-    
-    // Adiciona a formatação ao elemento temporário
-    tempDiv.style.fontFamily = "Arial, sans-serif"; // Fonte Arial
-    tempDiv.style.fontSize = "16px"; // Tamanho 16px
-    tempDiv.style.color = "#000000"; // Cor preta
-    tempDiv.style.background = "transparent";  // Garantir fundo transparente
-    tempDiv.classList.add('content');
-    
-    tempDiv.querySelectorAll('p').forEach(p => {
-        p.style.marginTop = '0';
-        p.style.marginBottom = '0';
-        p.style.lineHeight = '27px'; // 27px (1.5 * 16px) de espaçamento entre linhas
-        p.style.background = "transparent";  // Garantir fundo transparente
-        p.style.fontFamily = "Arial, sans-serif"; // Fonte Arial
-        p.style.fontSize = "16px"; // Tamanho 16px
+
+    const blob = new Blob([htmlString], { type: 'text/html' });
+    const clipboardItem = new ClipboardItem({ 'text/html': blob });
+
+    navigator.clipboard.write([clipboardItem]).then(() => {
+        showAlert3s('Cabeçalho copiado com sucesso! Lembre-se de alterar a forma de colar no Word para "Manter a formatação original"');
+    }).catch(err => {
+        console.error('Falha ao copiar o cabeçalho: ', err);
+        showAlert3s('Erro ao copiar o cabeçalho.');
     });
+};
+// ===================================================================
+// FIM DA FUNÇÃO CORRIGIDA
+// ===================================================================
 
-    // Adiciona o elemento ao DOM temporariamente para copiar
-    document.body.appendChild(tempDiv);
+// ===================================================================
+// NOVA FUNÇÃO: adicionar cláusula mantendo a formatação original do cabeçalho
+// ===================================================================
 
-    // Cria a seleção do conteúdo a ser copiado
-    const range = document.createRange();
-    range.selectNodeContents(tempDiv);
-    const selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
+window.adicionarClausulaAoTexto = (id) => {
+    const clause = allClauses[id];
+    if (!clause) return showAlert3s('Cláusula não encontrada.');
 
-    // Realiza a cópia
-    document.execCommand("copy");
+    // Captura os conteúdos originais (já formatados)
+    const output1 = document.getElementById('output1').innerHTML;
+    const output2 = document.getElementById('output2').innerHTML;
+    const output3 = document.getElementById('output3').innerHTML;
 
-    // Remove o elemento temporário
-    document.body.removeChild(tempDiv);
-
-    showAlert3s('Texto copiado para a área de transferência!');
-}
-
-
-function processarCaixas() {
-    const caixa1 = document.getElementById('caixa1').value.split('\n');
-    if (caixa1.length > 1) {
-        document.getElementById('caixa2').value = caixa1[1].replace(/[^\d\W]/g, '');
+    if (!output1 && !output2 && !output3) {
+        showAlert3s('Primeiro gere e copie o cabeçalho antes de incluir cláusulas.');
+        return;
     }
 
-    const orgaoJulgadorIndex = caixa1.findIndex(line => line.includes('Órgão julgador'));
-    if (orgaoJulgadorIndex !== -1 && orgaoJulgadorIndex + 1 < caixa1.length) {
-        document.getElementById('caixa3').value = caixa1[orgaoJulgadorIndex + 1];
+    // === Montagem do cabeçalho original (mantém tudo igual ao botão "Copiar Cabeçalho") ===
+    const cabecalhoHTML = `
+        <div style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 18pt;">
+            <table style="border-collapse: collapse; width: 100%; border: 1px solid black;">
+                <tbody>
+                    <tr>
+                        <td style="border: 1px solid black; padding: 5pt; line-height: 18pt;">
+                            <p style="text-align: center;"><strong style="text-decoration: underline;">DADOS EXTRAÍDOS DO PJE</strong></p>
+                            <div>${output1}</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p style="font-size: 6pt; margin: 0;">&nbsp;</p>
+
+            <table style="border-collapse: collapse; width: 100%; border: 1px solid black;">
+                <tbody>
+                    <tr>
+                        <td style="border: 1px solid black; padding: 5pt; line-height: 18pt;">
+                            <p style="text-align: center;"><strong style="text-decoration: underline;">PARTICIPANTES DA AUDIÊNCIA</strong></p>
+                            <div>${output2}</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p style="font-size: 6pt; margin: 0;">&nbsp;</p>
+
+            <table style="border-collapse: collapse; width: 100%; border: 1px solid black;">
+                <tbody>
+                    <tr>
+                        <td style="border: 1px solid black; padding: 5pt; line-height: 18pt;">
+                            <p style="text-align: center;">
+                                <strong style="text-decoration: underline;">DADOS DAS PARTES</strong><br>
+                                <span style="font-size: 12pt;">(Portaria Conjunta GPR, GPVP, GSVP e GC n.º 71/2013; e CPC, art. 319, II)</span>
+                            </p>
+                            <div>${output3}</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    // === Parágrafo fixo com data ===
+    const agora = new Date();
+    const dia = String(agora.getDate()).padStart(2, '0');
+    const mes = agora.toLocaleString('pt-BR', { month: 'long' });
+    const ano = agora.getFullYear();
+    
+
+    const paragrafoData = `
+        <p style="font-family: Arial; font-size: 12pt; line-height: 1.5; text-align: justify; margin: 12pt 0 12pt 0;">
+        Em ${dia} de ${mes} de ${ano}, às XXhXXmin, os participantes acima indicados e qualificados participaram da audiência virtual no 
+        <strong>Centro Judiciário de Solução de Conflitos e Cidadania Virtual 3 (e-CEJUSC 3)</strong>, 
+        por meio do aplicativo denominado Microsoft TEAMS, observando as regras da Portaria GSVP/TJDFT nº. 81/2016. 
+        As partes presentes confirmaram os seus dados pessoais e as pessoas físicas apresentaram por vídeo seus documentos de identificação. 
+        Durante a audiência, as partes concordaram com o seguinte acordo:
+        </p>
+
+        <p style="font-family: Arial; font-size: 12pt; line-height: 1.5; text-align: justify; margin: 12pt 0 12pt 0; color: red;"> 
+            Ou no caso de um acordo parcial
+        </p> 
+
+        <p style="font-family: Arial; font-size: 12pt; line-height: 1.5; text-align: justify; margin: 12pt 0 12pt 0;">
+        Em ${dia} de ${mes} de ${ano}, às XXhXXmin, os participantes acima indicados e qualificados participaram da audiência virtual no 
+        <strong>Centro Judiciário de Solução de Conflitos e Cidadania Virtual 3 (e-CEJUSC 3)</strong>, 
+        por meio do aplicativo denominado Microsoft TEAMS, observando as regras da Portaria GSVP/TJDFT nº. 81/2016. 
+        As partes presentes confirmaram os seus dados pessoais e as pessoas físicas apresentaram por vídeo seus documentos de identificação. Durante a 
+        audiência, <strong>a(s) parte(s) autora(s) e a(s) parte(s) requerida(s) XXXXXXX, de forma livre e espontânea, celebraram o seguinte ACORDO PARCIAL:</strong>
+        </p>
+    `;
+
+    // === Cláusula selecionada ===
+    const clausulaFormatada = `
+        <div style="font-family: Arial; font-size: 12pt; line-height: 1.5; text-align: justify; margin: 12pt 0 0 0;">
+            ${clause.content}
+        </div>
+    `;
+
+    // === Junta tudo ===
+    const textoFinal = `${cabecalhoHTML}<br>${paragrafoData}${clausulaFormatada}`;
+
+    // === Copia o texto completo ===
+    const blob = new Blob([textoFinal], { type: 'text/html' });
+    const clipboardItem = new ClipboardItem({ 'text/html': blob });
+    navigator.clipboard.write([clipboardItem]).then(() => {
+        showAlert3s('Cabeçalho + cláusula copiados com sucesso!');
+    }).catch(err => {
+        console.error('Erro ao copiar conteúdo combinado: ', err);
+        showAlert3s('Erro ao copiar o conteúdo combinado.');
+    });
+};
+
+// Substitui o botão de visualização para incluir o novo botão "Adicionar ao Cabeçalho"
+window.selectClause = (id) => {
+    const clause = allClauses[id];
+    if (!clause) return;
+    document.querySelectorAll('.clausula-item').forEach(el => el.classList.remove('selected'));
+    const selectedElement = document.querySelector(`.clausula-item[data-id="${id}"]`);
+    if (selectedElement) selectedElement.classList.add('selected');
+    const viewer = document.getElementById('clausula-viewer');
+    viewer.innerHTML = `
+        <div class="flex justify-between items-center mb-4 pb-2 border-b border-[var(--card-border)]">
+            <h3 class="text-2xl font-bold">${clause.title}</h3>
+            <div class="flex gap-2">
+                <button onclick="copyClauseContent()" class="botao flex items-center" style="background-color: var(--primary-color);">
+                    <i class="fas fa-copy mr-2"></i>Copiar
+                </button>
+                <button onclick="adicionarClausulaAoTexto('${id}')" class="botao flex items-center" style="background-color: var(--secondary-color);">
+                    <i class="fas fa-plus mr-2"></i>Adicionar ao Cabeçalho
+                </button>
+            </div>
+        </div>
+        <div id="clause-content-display" class="prose dark:prose-invert max-w-none">${clause.content}</div>
+    `;
+};
+
+// ===================================================================
+// FIM DA FUNÇÃO NOVA
+// ===================================================================
+
+
+    window.processarCaixas = () => {
+        const caixa1 = document.getElementById('caixa1').value.split('\n');
+        if (caixa1.length > 1) {
+            document.getElementById('caixa2').value = caixa1[1].replace(/[^\d\W]/g, '');
+        }
+        const orgaoJulgadorIndex = caixa1.findIndex(line => line.includes('Órgão julgador'));
+        if (orgaoJulgadorIndex !== -1 && orgaoJulgadorIndex + 1 < caixa1.length) {
+            document.getElementById('caixa3').value = caixa1[orgaoJulgadorIndex + 1];
+        }
+        const poloAtivoIndex = caixa1.findIndex(line => line.includes('Polo ativo'));
+        const poloPassivoIndex = caixa1.findIndex(line => line.includes('Polo passivo'));
+        if (poloAtivoIndex !== -1 && poloPassivoIndex !== -1 && poloAtivoIndex < poloPassivoIndex) {
+            const requerentes = caixa1.slice(poloAtivoIndex + 1, poloPassivoIndex).filter(line => !line.startsWith(' ')).map(line => line.replace('Parte cadastrada no Domicilio Judicial Eletrônico - Resolução CNJ Nº 455 de 27/04/2022 ', '')).filter(line => !line.includes('Procuradoria cadastrada no'));
+            document.getElementById('caixa4').value = requerentes.join('\n');
+        }
+        const iconeDownloadIndex = caixa1.findIndex(line => line.includes('Ícone de download'));
+        if (poloPassivoIndex !== -1 && iconeDownloadIndex !== -1 && iconeDownloadIndex > poloPassivoIndex) {
+            const requeridos = caixa1.slice(poloPassivoIndex + 1, iconeDownloadIndex).filter(line => /(REQUERIDO|RÉU|REU|EXECUTADO|EMBARGADO)\)$/.test(line.trim())).map(line => line.replace('Parte cadastrada no Domicilio Judicial Eletrônico - Resolução CNJ Nº 455 de 27/04/2022 ', ''));
+            document.getElementById('caixa6').value = requeridos.join('\n');
+        }
+        document.getElementById('caixa5').value = formatarRequerentes(document.getElementById('caixa4').value.split('\n'));
+        document.getElementById('caixa7').value = formatarRequeridos(document.getElementById('caixa6').value.split('\n'));
+        atualizarOutputs();
     }
 
-    const poloAtivoIndex = caixa1.findIndex(line => line.includes('Polo ativo'));
-    const poloPassivoIndex = caixa1.findIndex(line => line.includes('Polo passivo'));
-    if (poloAtivoIndex !== -1 && poloPassivoIndex !== -1 && poloAtivoIndex < poloPassivoIndex) {
-        const requerentes = caixa1.slice(poloAtivoIndex + 1, poloPassivoIndex)
-            .filter(line => !line.startsWith(' '))
-            .map(line => {
-              if (line.includes('Parte cadastrada no Domicilio Judicial Eletrônico - Resolução CNJ Nº 455 de 27/04/2022')) {
-                  return line.replace('Parte cadastrada no Domicilio Judicial Eletrônico - Resolução CNJ Nº 455 de 27/04/2022 ', '');
-              }
-              return line;
-             })
-            .filter(line => !line.includes('Procuradoria cadastrada no')); // Exclui linhas com a expressão
-        document.getElementById('caixa4').value = requerentes.join('\n');
-    }
-
-    const poloPassivoIndex2 = caixa1.findIndex(line => line.includes('Polo passivo'));
-    const iconeDownloadIndex = caixa1.findIndex(line => line.includes('Ícone de download'));
-
-    if (poloPassivoIndex2 !== -1 && iconeDownloadIndex !== -1 && iconeDownloadIndex > poloPassivoIndex2) {
-        const requeridos = caixa1.slice(poloPassivoIndex2 + 1, iconeDownloadIndex)
-            .filter(line => /(REQUERIDO|RÉU|REU|EXECUTADO|EMBARGADO)\)$/.test(line.trim()))
-            .map(line => {
-              if (line.includes('Parte cadastrada no Domicilio Judicial Eletrônico - Resolução CNJ Nº 455 de 27/04/2022')) {
-                  return line.replace('Parte cadastrada no Domicilio Judicial Eletrônico - Resolução CNJ Nº 455 de 27/04/2022 ', '');
-              }
-              return line;
-             });
-        document.getElementById('caixa6').value = requeridos.join('\n');
-    }
-
-    document.getElementById('caixa5').value = formatarRequerentes(document.getElementById('caixa4').value.split('\n'));
-    document.getElementById('caixa7').value = formatarRequeridos(document.getElementById('caixa6').value.split('\n'));
-
-    // Atualiza os outputs diretamente aqui
-    atualizarOutputs();
-}
-
-    function formatarRequerentes(requerentes) {
+    const formatarRequerentes = (requerentes) => {
         if (requerentes.length === 1) {
             return `<b>Requerente:</b> ${requerentes[0].replace(/ \((REQUERENTE|AUTOR|EXEQUENTE|AUTORA|EMBARGANTE)\)/g, '')}`;
         }
         return requerentes.map((req, index) => `<b>${index + 1}º Requerente:</b> ${req.replace(/ \((REQUERENTE|AUTOR|EXEQUENTE|AUTORA|EMBARGANTE)\)/g, '')}`).join('\n');
     }
 
-    function formatarRequeridos(requeridos) {
+    const formatarRequeridos = (requeridos) => {
         if (requeridos.length === 1) {
             return `<b>Requerido(a):</b> ${requeridos[0].replace(/ \((REQUERIDO|RÉU|REU|EXECUTADO|EMBARGADO)\)/g, '')}`;
         }
         return requeridos.map((req, index) => `<b>${index + 1}º Requerido(a):</b> ${req.replace(/ \((REQUERIDO|RÉU|REU|EXECUTADO|EMBARGADO)\)/g, '')}`).join('\n');
     }
 
-    function atualizarOutputs() {
-    const caixa4 = document.getElementById('caixa4').value.split('\n');
-    const caixa6 = document.getElementById('caixa6').value.split('\n');
-
-    // Adicionado: Verifica se as expressões (EXEQUENTE) e (EXECUTADO) estão presentes
-    const hasExequente = caixa4.some(line => /\(EXEQUENTE\)$/.test(line.trim()));
-    const hasExecutado = caixa6.some(line => /\(EXECUTADO\)$/.test(line.trim()));
-
-    // Adicionado: Verifica se as expressões (EMBARGANTE) e (EMBARGADO) estão presentes
-    const hasEmbargante = caixa4.some(line => /\(EMBARGANTE\)$/.test(line.trim()));
-    const hasEmbargado = caixa6.some(line => /\(EMBARGADO\)$/.test(line.trim()));
-
-
-    // Adicionado: Define os termos dinâmicos para os outputs
-    const exequenteTermo = hasExequente ? 'Exequente' : hasEmbargante ? 'Embargante' : 'Requerente';
-    const executadoTermo = hasExecutado ? 'Executado(a)' : hasEmbargado ? 'Embargado(a)' : 'Requerido(a)';
-    const exequenteParte = hasExequente ? 'EXEQUENTE' : hasEmbargante ? 'EMBARGANTE' : 'REQUERENTE';
-    const executadoParte = hasExecutado ? 'EXECUTADA' : hasEmbargado ? 'EMBARGADA' : 'REQUERIDA';
-    
-
-    const caixa8 = `<b>Juízo:</b> ${document.getElementById('caixa3').value}\n` +
-        `<b>Processo:</b> ${document.getElementById('caixa2').value}\n` +
-        `${document.getElementById('caixa5').value.replace(/Requerente:/g, `${exequenteTermo}:`).replace(/Requerido\(a\):/g, `${executadoTermo}:`)}\n` +
-        `${document.getElementById('caixa7').value.replace(/Requerente:/g, `${exequenteTermo}:`).replace(/Requerido\(a\):/g, `${executadoTermo}:`)}`;
-
-    const caixa9 = caixa8.split('\n').slice(2).map(line => `
-${line.trim()}
-<b>Telefone:</b> Número
-<b>Preposto(a):</b> nome completo, <b>CPF:</b> número, <b>telefone:</b> número (<b>Carta de preposto ID n. xxxx</b>).
-<b>Advogado(a):</b> nome completo, <b>OAB/DF:</b> número, <b>telefone:</b> número (<b>Procuração ID xxxx</b>).
-<br>
-`).join('\n').replace(/^\s+/gm, '');
-
-    const textoAdicional = `
-<b>Observador(es):</b> Nome completo, CPF, (...), que assume(m) o dever de confidencialidade (CPC, art. 166, § 1º).<br>
-<b>Conciliador(es):</b> Mayson José Dos Santos Damasceno &emsp; <b>Sala:</b> número da sala<br>
-<b>Supervisor(es):</b> Nome se houver e <b>Matrícula:</b> número
-`;
-
-    const formatBold = text => text.replace(/(CPF:|CNPJ:)/g, '<b>$1</b>');
-
-    function formatParagraphs(text, isOutput1 = false) {
-        return text.split('\n').map((line, index) => isOutput1 && index === 0 ? `<p><b>${line}</b></p>` : `<p>${line.trim()}</p>`).join('');
-    }
-
-    // Atualiza os outputs 1 e 2 conforme os termos definidos
-    document.getElementById('output1').innerHTML = formatParagraphs(formatBold(caixa8), true);
-    document.getElementById('output1').setAttribute('contenteditable', 'true');
-    document.getElementById('output2').innerHTML = formatParagraphs(formatBold(caixa9 + textoAdicional));
-    document.getElementById('output2').setAttribute('contenteditable', 'true');
-
-    // Atualiza o output3 com os dados das partes
-    const requerentes = caixa4.map(req => req.replace(/ \((REQUERENTE|AUTOR|EXEQUENTE|AUTORA)\)/g, '').trim());
-    const requeridos = caixa6.map(req => req.replace(/ \((REQUERIDO|RÉU|REU|EXECUTADO)\)/g, '').trim());
-
-    let output3Content = '';
-    if (requerentes.length === 1) {
-        const req = requerentes[0];
-        if (req.includes('CNPJ:')) {
-            output3Content += `<div class="parte"><b>A parte ${exequenteParte}: ${req}</b>, pessoa jurídica estabelecida no(a) xxxx, telefone xxx e e-mail xxxx OU pessoa jurídica cadastrada no domicilio judicial eletrônico - Resolução CNJ nº 455 de 27/05/2022.</div> <br>`;
-        } else {
-            output3Content += `<div class="parte"><b>A parte ${exequenteParte}: ${req}</b>, residente e domiciliado(a) xxxx, telefone xxxx e e-mail xxxx.</div> <br>`;
-        }
-    } else {
+    const atualizarOutputs = () => {
+        const caixa4 = document.getElementById('caixa4').value.split('\n');
+        const caixa6 = document.getElementById('caixa6').value.split('\n');
+        const hasExequente = caixa4.some(line => /\(EXEQUENTE\)$/.test(line.trim()));
+        const hasExecutado = caixa6.some(line => /\(EXECUTADO\)$/.test(line.trim()));
+        const hasEmbargante = caixa4.some(line => /\(EMBARGANTE\)$/.test(line.trim()));
+        const hasEmbargado = caixa6.some(line => /\(EMBARGADO\)$/.test(line.trim()));
+        const exequenteTermo = hasExequente ? 'Exequente' : hasEmbargante ? 'Embargante' : 'Requerente';
+        const executadoTermo = hasExecutado ? 'Executado(a)' : hasEmbargado ? 'Embargado(a)' : 'Requerido(a)';
+        const exequenteParte = hasExequente ? 'EXEQUENTE' : hasEmbargante ? 'EMBARGANTE' : 'REQUERENTE';
+        const executadoParte = hasExecutado ? 'EXECUTADA' : hasEmbargado ? 'EMBARGADA' : 'REQUERIDA';
+        const caixa8 = `<b>Juízo:</b> ${document.getElementById('caixa3').value}\n` +
+            `<b>Processo:</b> ${document.getElementById('caixa2').value}\n` +
+            `${document.getElementById('caixa5').value.replace(/Requerente:/g, `${exequenteTermo}:`)}\n` +
+            `${document.getElementById('caixa7').value.replace(/Requerido\(a\):/g, `${executadoTermo}:`)}`;
+        const caixa9 = caixa8.split('\n').slice(2).map(line => `${line.trim()}<br><b>Telefone:</b> Número<br><b>Preposto(a):</b> nome completo, <b>CPF:</b> número, <b>telefone:</b> número (<b>Carta de preposto ID n. xxxx</b>).<br><b>Advogado(a):</b> nome completo, <b>OAB/DF:</b> número, <b>telefone:</b> número (<b>Procuração ID xxxx</b>).<br><br>`).join('').replace(/^\s+/gm, '');
+        const textoAdicional = `<b>Observador(es):</b> Nome completo, CPF, (...), que assume(m) o dever de confidencialidade (CPC, art. 166, § 1º).<br><br><b>Conciliador(es)/Mediador(es):</b> Nome completo &emsp; <b>Sala:</b> número da sala<br><br><b>Supervisor(es):</b> Nome se houver e <b>Matrícula:</b> número`;
+        const formatBold = text => text.replace(/(CPF:|CNPJ:)/g, '<b>$1</b>');
+        document.getElementById('output1').innerHTML = formatBold(caixa8).replace(/\n/g, '<br>');
+        document.getElementById('output2').innerHTML = formatBold(caixa9 + textoAdicional);
+        const requerentes = caixa4.map(req => req.replace(/ \((REQUERENTE|AUTOR|EXEQUENTE|AUTORA|EMBARGANTE)\)/g, '').trim());
+        const requeridos = caixa6.map(req => req.replace(/ \((REQUERIDO|RÉU|REU|EXECUTADO|EMBARGADO)\)/g, '').trim());
+        let output3Content = '';
         requerentes.forEach((req, index) => {
-            const ordinal = `${index + 1}ª`;
-            if (req.includes('CNPJ:')) {
-                output3Content += `<div class="parte"><b>A parte ${ordinal} ${exequenteParte}: ${req}</b>, pessoa jurídica estabelecida no(a) xxxx, telefone xxx e e-mail xxxx OU pessoa jurídica cadastrada no domicilio judicial eletrônico - Resolução CNJ nº 455 de 27/05/2022.</div><br>`;
-            } else {
-                output3Content += `<div class="parte"><b>A parte ${ordinal} ${exequenteParte}: ${req}</b>, residente e domiciliado(a) xxxx, telefone xxxx e e-mail xxxx.</div> <br>`;
-            }
+            const prefix = requerentes.length > 1 ? `A parte ${index + 1}ª ${exequenteParte}` : `A parte ${exequenteParte}`;
+            const type = req.includes('CNPJ:') ? 'pessoa jurídica estabelecida no(a)' : 'residente e domiciliado(a)';
+            output3Content += `<p><b>${prefix}: ${req}</b>, ${type} xxxx, telefone xxxx e e-mail xxxx.</p>`;
         });
-    }
-
-    if (requeridos.length === 1) {
-        const req = requeridos[0];
-        if (req.includes('CNPJ:')) {
-            output3Content += `<div class="parte"><b>A parte ${executadoParte}: ${req}</b>, pessoa jurídica estabelecida no(a) xxxx, telefone xxx e e-mail xxxx OU pessoa jurídica cadastrada no domicilio judicial eletrônico - Resolução CNJ nº 455 de 27/05/2022..</div> <br>`;
-        } else {
-            output3Content += `<div class="parte"><b>A parte ${executadoParte}: ${req}</b>, residente e domiciliado(a) xxxx, telefone xxxx e e-mail xxxx.</div> <br>`;
-        }
-    } else {
-        requeridos.forEach((req, index) => {
-            const ordinal = `${index + 1}ª`;
-            if (req.includes('CNPJ:')) {
-                output3Content += `<div class="parte"><b>A parte ${ordinal} ${executadoParte}: ${req}</b>, pessoa jurídica estabelecida no(a) xxxx, telefone xxx e e-mail xxxx OU pessoa jurídica cadastrada no domicilio judicial eletrônico - Resolução CNJ nº 455 de 27/05/2022..</div> <br>`;
-            } else {
-                output3Content += `<div class="parte"><b>A parte ${ordinal} ${executadoParte}: ${req}</b>, residente e domiciliado(a) xxxx, telefone xxxx e e-mail xxxx.</div> <br>`;
-            }
+         requeridos.forEach((req, index) => {
+            const prefix = requeridos.length > 1 ? `A parte ${index + 1}ª ${executadoParte}` : `A parte ${executadoParte}`;
+            const type = req.includes('CNPJ:') ? 'pessoa jurídica estabelecida no(a)' : 'residente e domiciliado(a)';
+            output3Content += `<p><b>${prefix}: ${req}</b>, ${type} xxxx, telefone xxxx e e-mail xxxx.</p>`;
         });
+        document.getElementById('output3').innerHTML = output3Content;
     }
 
-    // Atualiza o conteúdo do output3
-    document.getElementById('output3').innerHTML = output3Content;
-    document.getElementById('output3').setAttribute('contenteditable', 'true');
-}
-
-
-//Gerar word
-function gerarWord() {
-    // Captura os conteúdos dos outputs
-    const output1 = document.getElementById('output1').innerHTML;
-    const output2 = document.getElementById('output2').innerHTML;
-    const output3 = document.getElementById('output3').innerHTML;
-
-    // Link da imagem hospedada
-    const imagemURL = 'https://i.imgur.com/HD5W5cV.jpeg'; // Substitua pelo link correto
-
-    // Cria o conteúdo com a imagem via URL
-    const content = `
-<html xmlns:o="urn:schemas-microsoft-com:office:office"
-      xmlns:w="urn:schemas-microsoft-com:office:word"
-      xmlns="http://www.w3.org/TR/REC-html40">
-<head>
-    <meta charset="UTF-8">
-    <style>
-        @page WordSection1 {
-            size: 595.3pt 841.9pt; /* Tamanho A4 */
-            margin: 2cm; /* Margens: 2 cm em todos os lados */
-        }
-        div.WordSection1 {
-            page: WordSection1;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            font-size: 12pt;
-            color: black;
-            text-align: justify;
-            margin: 0;
-            line-height: 27px; /* Espaçamento entre linhas de 27px */
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        td {
-            padding: 10px;
-        }
-        /* Parágrafos com espaçamento entre linhas e sem espaçamento adicional entre parágrafos */
-        p {
-            line-height: 27px; /* Espaçamento entre linhas de 27px */
-            margin-top: 0;
-            margin-bottom: 0; /* Remover o espaçamento entre os parágrafos */
-        }
-        .titulo {
-            text-align: center;
-            font-weight: bold;
-            text-decoration: underline;
-            line-height: 27px; /* Garantir espaçamento entre linhas */
-            margin-bottom: 10px; /* Espaço abaixo do título */
-        }
-        .titulo_complementacao {
-            text-align: center;
-            font-weight: bold;
-            line-height: 27px; /* Espaçamento entre linhas */
-        }
-        .header, .footer {
-            text-align: center;
-            font-size: 10pt;
-            font-family: Arial, sans-serif;
-            color: gray;
-        }
-        .Topo_titulo {
-            text-align: center;
-            font-weight: bold;
-            line-height: 27px; /* Espaçamento entre linhas */
-            margin-bottom: 10px; /* Espaço abaixo do topo */
-        }
-        /* Estilos para contenteditable */
-        [contenteditable="true"] {
-            border: 1px dashed #007bff;
-            padding: 5px;
-            min-height: 50px; /* Para garantir que a área seja clicável mesmo vazia */
-            background-color: #f8f9fa; /* Um fundo levemente diferente para indicar edição */
-            cursor: text;
-        }
-        body.dark [contenteditable="true"] {
-            border: 1px dashed #0056b3;
-            background-color: #2a2a2a;
-        }
-
-    </style>
-
-</head>
-
-<body>
-<!-- DESATIVEI COM COMENTÁRIO. ESSA PARTE TRAZIA A IMAGEM QUE SERIA O CABEÇALHO -->
-    <div class="WordSection1">
-        <!-- Cabeçalho com imagem via URL -->
-        <!--<div class="header">
-            <img src="${imagemURL}" alt="Cabeçalho">
-        </div>-->
-        
-        <!-- Conteúdo -->
-        <div>
-            <p class="Topo_titulo">TERMO DE SESSÃO DE CONCILIAÇÃO – JUIZADO ESPECIAL CÍVEL</p>
-            <p class="Topo_titulo">(____________)</p>
-        </div>
-        <table style="margin-bottom: 0;">
-            <tr>
-                <td>
-                    <p class="titulo">DADOS EXTRAÍDOS DO PJE</p>
-                    ${output1}
-                </td>
-            </tr>
-        </table>
-
-        <p style="margin: 0;">&nbsp;</p> <!-- Parágrafo vazio com margem zero -->
-
-        <table style="margin-bottom: 0;">
-            <tr>
-                <td>
-                    <p class="titulo">PARTICIPANTES DA AUDIÊNCIA</p>
-                    ${output2}
-                </td>
-            </tr>
-        </table>
-
-        <p style="margin: 0;">&nbsp;</p> <!-- Parágrafo vazio com margem zero -->
-
-        <table style="margin-bottom: 0;">
-            <tr>
-                <td>
-                    <p class="titulo">DADOS DAS PARTES</p>
-                    <p class="titulo_complementacao">(Portaria Conjunta GPR, GPVP, GSVP e GC n.º 71/2013; e CPC, art. 319, II)</p>
-                    ${output3}
-                </td>
-            </tr>
-        </table>
-    </div>
-</body>
-
-</html>
-`;
-
-    // Cria um blob com o conteúdo
-    const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
-
-    // Cria um link para download
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    const nomeArquivo = document.getElementById('caixa2').value.trim().replace(/^_/, '');
-    link.href = url;
-    link.download = `${nomeArquivo} - CABEÇALHO.doc`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    window.gerarWord = () => {
+        const output1 = document.getElementById('output1').innerHTML;
+        const output2 = document.getElementById('output2').innerHTML;
+        const output3 = document.getElementById('output3').innerHTML;
+        const content = `<html xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><style>@page WordSection1 { size: 595.3pt 841.9pt; margin: 2cm; } div.WordSection1 { page: WordSection1; } body { font-family: Arial, sans-serif; font-size: 12pt; color: black; text-align: justify; line-height: 20pt; } table { width: 100%; border-collapse: collapse; margin-bottom: 20px; } table, td { border: 1px solid black; } td { padding: 10px; } p { line-height: 20pt; margin: 0; } .titulo { text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 10px; }</style></head><body><div class="WordSection1"><p style="text-align:center; font-weight:bold;">TERMO DE SESSÃO DE CONCILIAÇÃO – JUIZADO ESPECIAL CÍVEL</p><p style="text-align:center; font-weight:bold;">(____________)</p><table><tr><td><p class="titulo">DADOS EXTRAÍDOS DO PJE</p>${output1}</td></tr></table><p>&nbsp;</p><table><tr><td><p class="titulo">PARTICIPANTES DA AUDIÊNCIA</p>${output2}</td></tr></table><p>&nbsp;</p><table><tr><td><p class="titulo">DADOS DAS PARTES</p><p style="text-align:center;">(Portaria Conjunta GPR, GPVP, GSVP e GC n.º 71/2013; e CPC, art. 319, II))</p>${output3}</td></tr></table></div></body></html>`;
+        const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        const nomeArquivo = document.getElementById('caixa2').value.trim().replace(/^_/, '');
+        link.href = url;
+        link.download = `${nomeArquivo || 'documento'} - CABEÇALHO.doc`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
-    //Temas: claro e escuro
-    document.addEventListener("DOMContentLoaded", () => {
+    // --- TEMA CLARO/ESCURO ---
     const themeToggle = document.getElementById("theme-toggle");
     const themeIcon = document.getElementById("theme-icon");
-    const themeText = document.getElementById("theme-text");
     const body = document.body;
-
-    // Carrega o tema salvo no localStorage
     const savedTheme = localStorage.getItem("theme") || "light";
     body.classList.toggle("dark", savedTheme === "dark");
     themeIcon.className = savedTheme === "dark" ? "fas fa-sun" : "fas fa-moon";
-    themeText.textContent = savedTheme === "dark" ? "Tema Escuro" : "Tema Claro";
-
-    // Alterna o tema ao clicar
     themeToggle.addEventListener("change", () => {
         const isDark = body.classList.toggle("dark");
         themeIcon.className = isDark ? "fas fa-sun" : "fas fa-moon";
-        themeText.textContent = isDark ? "Tema Escuro" : "Tema Claro";
         localStorage.setItem("theme", isDark ? "dark" : "light");
     });
-});
-
-    </script>
+</script>
+</body>
+</html>
+   
 </body>
 </html>
